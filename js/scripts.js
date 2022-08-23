@@ -1,87 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+const cards = document.querySelectorAll('.carta-memoria');
 
-    <title>Jogo da Memória - Pokémon</title>
+let hasFlippedCard = false;
+let lockBoard = false;
+let firstCard, secondCard;
 
-    <link rel="stylesheet" href="./css/styles.css">
-</head>
-<body>
-    <section class="jogo-da-memoria">
-        <div class="carta-memoria" data-framework="pikachu">
-            <img class="front-face" src="img/pikachu.png"
-                alt="Pikachu" />
-            <img class="back-face" src="img/pokeball.png"
-                alt="Pokeball" />     
-        </div>
-        <div class="carta-memoria" data-framework="pikachu">
-            <img class="front-face" src="img/pikachu.png"
-                alt="Pikachu" />
-            <img class="back-face" src="img/pokeball.png"
-                alt="Pokeball" />     
-        </div>
-        <div class="carta-memoria" data-framework="raticate">
-            <img class="front-face" src="img/raticate.webp"
-                alt="Raticate" />
-            <img class="back-face" src="img/pokeball.png"
-                alt="Pokeball" />     
-        </div>
-        <div class="carta-memoria" data-framework="raticate">
-            <img class="front-face" src="img/raticate.webp"
-                alt="Raticate" />
-            <img class="back-face" src="img/pokeball.png"
-                alt="Pokeball" />     
-        </div>
-        <div class="carta-memoria" data-framework="emolga">
-            <img class="front-face" src="img/emolga.png"
-                alt="Emolga" />
-            <img class="back-face" src="img/pokeball.png"
-                alt="Pokeball" />     
-        </div>
-        <div class="carta-memoria" data-framework="emolga">
-            <img class="front-face" src="img/emolga.png"
-                alt="Emolga" />
-            <img class="back-face" src="img/pokeball.png"
-                alt="Pokeball" />     
-        </div>
-        <div class="carta-memoria" data-framework="pachirisu">
-            <img class="front-face" src="img/pachirisu.png"
-                alt="Pachirisu" />
-            <img class="back-face" src="img/pokeball.png"
-                alt="Pokeball" />     
-        </div>
-        <div class="carta-memoria" data-framework="pachirisu">
-            <img class="front-face" src="img/pachirisu.png"
-                alt="Pachirisu" />
-            <img class="back-face" src="img/pokeball.png"
-                alt="Pokeball" />     
-        </div>
-        <div class="carta-memoria" data-framework="bidoof">
-            <img class="front-face" src="img/bidoof.png"
-                alt="Bidof" />
-            <img class="back-face" src="img/pokeball.png"
-                alt="Pokeball" />     
-        </div>
-        <div class="carta-memoria" data-framework="bidoof">
-            <img class="front-face" src="img/bidoof.png"
-                alt="Bidof" />
-            <img class="back-face" src="img/pokeball.png"
-                alt="Pokeball" />     
-        </div>
-        <div class="carta-memoria" data-framework="marill">
-            <img class="front-face" src="img/marill.webp"
-                alt="Marill" />
-            <img class="back-face" src="img/pokeball.png"
-                alt="Pokeball" />     
-        </div>
-        <div class="carta-memoria" data-framework="marill">
-            <img class="front-face" src="img/marill.webp"
-                alt="Marill" />
-            <img class="back-face" src="img/pokeball.png"
-                alt="Pokeball" />     
-        </div>
-    </section>
-    <script src="./js/scripts.js"></script>
-</body>
-</html>
+function flipCard() {
+  if (lockBoard) return;
+  if (this === firstCard) return;
+
+  this.classList.add('flip');
+
+  if (!hasFlippedCard) {
+    // first click
+    hasFlippedCard = true;
+    firstCard = this;
+
+    return;
+  }
+
+  // second click
+  secondCard = this;
+
+  checkForMatch();
+}
+
+function checkForMatch() {
+  let isMatch = firstCard.dataset.framework === secondCard.dataset.framework;
+
+  isMatch ? disableCards() : unflipCards();
+}
+
+function disableCards() {
+  firstCard.removeEventListener('click', flipCard);
+  secondCard.removeEventListener('click', flipCard);
+
+  resetBoard();
+}
+
+function unflipCards() {
+  lockBoard = true;
+
+  setTimeout(() => {
+    firstCard.classList.remove('flip');
+    secondCard.classList.remove('flip');
+
+    resetBoard();
+  }, 1500);
+}
+
+function resetBoard() {
+  [hasFlippedCard, lockBoard] = [false, false];
+  [firstCard, secondCard] = [null, null];
+}
+
+(function shuffle() {
+  cards.forEach(card => {
+    let randomPos = Math.floor(Math.random() * 12);
+    card.style.order = randomPos;
+  });
+})();
+
+cards.forEach(card => card.addEventListener('click', flipCard));
